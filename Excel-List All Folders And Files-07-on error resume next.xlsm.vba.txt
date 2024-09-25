@@ -1,0 +1,260 @@
+' Lets try listing all files and folders of current folder. it run into and error if current folder is a driver. 
+' All Folders And Files-07-on error resume next.xlsm
+' please do not forget to enter this code into a file that is saved as ".xlsm" file.
+'
+' NOTE: You need to add Microsoft Scripting Runtime reference as below:
+' tools menu/ references / Microsoft Scripting Runtime
+
+    Dim row_pointer As LongLong
+    Dim col_pointer As Long
+
+'error loging from https://bettersolutions.com
+Public g_objFSO As Scripting.FileSystemObject
+Public g_scrText As Scripting.TextStream
+
+Sub Macro1()
+'
+' Macro1 Macro
+'
+' Keyboard Shortcut: Ctrl+Shift+A
+'
+    'test
+'    Range("B2").Select
+'    ActiveCell.FormulaR1C1 = "d"
+'    Range("B2").Select
+    Dim current_path As String
+    
+    
+    row_pointer = 1
+    col_pointer = 1
+    
+'    row_pionter = row_pionter + 1
+'    col_pointer = col_pointer + 1
+'    Cells(1, 1).Select
+    Cells(1, 1).Value = "OPTION"
+'    Cells(2, 1).Select
+    Cells(2, 1).Value = "VALUE"
+
+'    Cells(1, 2).Select
+    Cells(1, 2).Value = "current path"
+'    Cells(1, 3).Select
+    Cells(1, 3).Value = "working path"
+'    Cells(1, 4).Value = "col_pointer"
+'    Cells(1, 5).Value = ""
+'    Cells(1, 6).Value = ""
+'    Cells(1, 7).Value = ""
+    
+    
+    'getting of current path    Cells(2, 2).Value = Application.ActiveWorkbook.Path
+    current_path = Application.ActiveWorkbook.Path
+'    Cells(2, 2).Select
+    Cells(2, 2).Value = current_path
+    
+'    'list of files of current folders
+'    Dim oFSO As Object
+'    Dim oFolder As Object
+'    Dim oFile As Object
+'    Dim i As Integer
+'
+'    row_pointer = 3
+'    col_pointer = 2
+'    Set oFSO = CreateObject("Scripting.FileSystemObject")
+'
+'    Set oFolder = oFSO.GetFolder(current_path)
+'
+'    For Each oFile In oFolder.Files
+'
+''    Cells(i + 1, 1) = oFile.Name
+'    Cells(row_pointer, col_pointer) = oFile.Name
+'
+''    i = i + 1
+'    row_pionter = row_pionter + 1
+'
+'    Next oFile
+    '--- For Example:Folder Name= "D:\Folder Name\"
+    row_pointer = 3
+'        Cells(row_pointer, 2).Select
+        Cells(row_pointer, 2).Formula = "index"
+'        Cells(row_pointer, 3).Formula = "name"
+'        Cells(row_pointer, col_pointer + 2).Select
+        Cells(row_pointer, col_pointer + 2).Formula = "Path"
+'        Cells(row_pointer, col_pointer + 4).Select
+        Cells(row_pointer, col_pointer + 4).Formula = "Size"
+'        Cells(row_pointer, 6).Formula = "Type"
+'        Cells(row_pointer, 7).Formula = "DateLastModified"
+'        Cells(row_pointer, 8).Formula = "=HYPERLINK(""" &amp; FileItem.Path &amp; """,""" &amp; "Click Here to Open" &amp; """)"
+
+    row_pointer = 4
+    col_pointer = 2
+    
+    Call GetFilesInFolder(current_path, True)
+
+    
+    
+    
+    
+End Sub
+'You are trying to use FileSystemObject (early binding) without specifying the reference to it in the Project References.
+'
+'You need to add Microsoft Scripting Runtime reference as below:
+' tools menu/ references / Microsoft Scripting Runtime
+
+Sub GetFilesInFolder(SourceFolderName As String, Subfolders As Boolean)
+'error loging
+    On Error Resume Next
+   
+'    Cells(2, 3).Select
+    Cells(2, 3).Value = SourceFolderName
+'--- For Example:Folder Name= "D:\Folder Name\" and Flag as Yes or No
+
+    Dim FSO As Scripting.FileSystemObject
+    Dim SourceFolder As Scripting.folder, SubFolder As Scripting.folder
+    Dim FileItem As Scripting.File
+    'Dim r As Long
+    Set FSO = New Scripting.FileSystemObject
+    Set SourceFolder = FSO.GetFolder(SourceFolderName)
+    
+    'when sum_size is more than long we use power_size to reduce the size
+    Dim sum_size As Long
+    Dim standard_size As Double
+    'when sum_size is more than long we devide it with 1024
+    Dim str_std_size As String
+    
+    
+    '--- This is for displaying, wherever you want can be configured
+    sum_size = 0
+    
+'    Cells(row_pointer, col_pointer + 1).Select
+    Cells(row_pointer, col_pointer + 1).Formula = "-- " & SourceFolder.Path & "\"
+
+    'folder size
+    ' --- --- --- start of fn.standardize the size
+    standard_size = SourceFolder.Size
+    If standard_size < 1024 Then
+        str_std_size = "B"
+    ElseIf CLng(standard_size / 1024) < 1024 Then
+        standard_size = CLng((standard_size / 1024) * 100) / 100
+        str_std_size = "KB"
+    Else
+        ' CLng = Convert double to long
+        standard_size = CLng(standard_size / 1024)
+        If (standard_size / 1024) < 1024 Then
+        standard_size = CLng((standard_size / 1024) * 100) / 100
+        str_std_size = "MB"
+    Else
+        ' CLng = Convert double to long
+        standard_size = CLng(standard_size / 1024)
+        If (standard_size / 1024) < 1024 Then
+        standard_size = CLng((standard_size / 1024) * 100) / 100
+        str_std_size = "GB"
+    End If
+    End If
+    End If
+'    End If
+    
+    ' --- --- --- end of fn.standardize the size
+'    Cells(row_pointer, col_pointer + 3).Select
+    Cells(row_pointer, col_pointer + 3).Formula = standard_size
+'    Cells(row_pointer, col_pointer + 4).Select
+    Cells(row_pointer, col_pointer + 4).Formula = str_std_size
+    row_pointer = row_pointer + 1
+    
+    col_pointer = col_pointer + 1
+    For Each FileItem In SourceFolder.Files
+        Cells(row_pointer, 2).Formula = row_pointer - 3
+'        Cells(row_pointer, 3).Formula = FileItem.Name
+        Cells(row_pointer, col_pointer + 1).Formula = FileItem.Path
+        
+        ' --- --- --- start of fn.standardize the size
+    standard_size = FileItem.Size
+    If standard_size < 1024 Then
+        str_std_size = "B"
+    ElseIf CLng(standard_size / 1024) < 1024 Then
+        standard_size = CLng((standard_size / 1024) * 100) / 100
+        str_std_size = "KB"
+    Else
+        ' CLng = Convert double to long
+        standard_size = CLng(standard_size / 1024)
+        If (standard_size / 1024) < 1024 Then
+        standard_size = CLng((standard_size / 1024) * 100) / 100
+        str_std_size = "MB"
+    Else
+        ' CLng = Convert double to long
+        standard_size = CLng(standard_size / 1024)
+        If (standard_size / 1024) < 1024 Then
+        standard_size = Int((standard_size / 1024) * 100) / 100
+        str_std_size = "GB"
+    End If
+    End If
+    End If
+'        End If
+        ' --- --- --- end of fn.standardize the size
+        Cells(row_pointer, col_pointer + 2).Formula = standard_size
+        Cells(row_pointer, col_pointer + 3).Formula = str_std_size
+        
+'        Cells(row_pointer, 6).Formula = FileItem.Type
+'        Cells(row_pointer, 7).Formula = FileItem.DateLastModified
+'        Cells(row_pointer, 8).Formula = "=HYPERLINK(""" &amp; FileItem.Path &amp; """,""" &amp; "Click Here to Open" &amp; """)"
+
+'        r = r + 1   ' next row number
+        row_pointer = row_pointer + 1   ' next row number
+    Next FileItem
+    col_pointer = col_pointer - 1
+    
+    '--- This is the Function to go each and Every Folder and get the Files. This is a Nested-Function Calling.
+
+    If Subfolders = True Then
+        col_pointer = col_pointer + 1
+        For Each SubFolder In SourceFolder.Subfolders
+            GetFilesInFolder SubFolder.Path, True
+        Next SubFolder
+        col_pointer = col_pointer - 1
+    End If
+
+    Set FileItem = Nothing
+    Set SourceFolder = Nothing
+    Set FSO = Nothing
+   
+'error loging from https://bettersolutions.com
+'ErrorHandler:
+'   Call Error_Handle(sProcName, Err.Number, Err.Description)
+    
+End Sub
+
+'error loging from https://bettersolutions.com
+Public Sub Error_Handle(ByVal sRoutineName As String, _
+                        ByVal sErrorNo As String, _
+                        ByVal sErrorDescription As String)
+Dim sMessage As String
+   sMessage = sErrorNo & " - " & sErrorDescription
+   Call MsgBox(sMessage, vbCritical, sRoutineName & " - Error")
+   Call LogFile_WriteError(sRoutineName, sMessage)
+End Sub
+
+'error loging from https://bettersolutions.com
+Public Function LogFile_WriteError(ByVal sRoutineName As String, _
+                                   ByVal sMessage As String)
+Dim sText As String
+   On Error GoTo ErrorHandler
+   If (g_objFSO Is Nothing) Then
+      Set g_objFSO = New FileSystemObject
+   End If
+   If (g_scrText Is Nothing) Then
+      If (g_objFSO.FileExists("C:\temp\mylog.txt") = False) Then
+         Set g_scrText = g_objFSO.OpenTextFile("C:\temp\mylog.txt", IOMode.ForWriting, True)
+      Else
+         Set g_scrText = g_objFSO.OpenTextFile("C:\temp\mylog.txt", IOMode.ForAppending)
+      End If
+   End If
+   sText = sText & "" & vbCrLf
+   sText = sText & Format(Date, "dd MMM yyyy") & "-" & Time() & vbCrLf
+   sText = sText & " " & sRoutineName & vbCrLf
+   sText = sText & " " & sMessage & vbCrLf
+   g_scrText.WriteLine sText
+   g_scrText.Close
+   Set g_scrText = Nothing
+   Exit Function
+ErrorHandler:
+   Set g_scrText = Nothing
+   Call MsgBox("Unable to write to log file", vbCritical, "LogFile_WriteError")
+End Function
