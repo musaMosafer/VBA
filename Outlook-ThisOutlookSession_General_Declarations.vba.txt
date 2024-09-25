@@ -1,0 +1,95 @@
+' We are trying to save all incomming and outgoing email as a mht file (a file that is better than msg file in font decoding-errors after saving an email.)
+' please check:
+' Tools / References:
+'	Visual Basice For Applications
+'	Microsoft Outlook 16.0 Object Library
+'	OLE Automation
+'	Microsoft Office 16.0 Object Library
+
+
+Option Explicit
+Private objNS As Outlook.NameSpace
+Private WithEvents objInboxItem As Outlook.Items
+Private WithEvents objSentItem As Outlook.Items
+
+Private Sub Application_Startup()
+ MsgBox "Application_Startup is running: "
+Dim objInboxWatchFolder As Outlook.Folder
+Dim objSentWatchFolder As Outlook.Folder
+Set objNS = Application.GetNamespace("MAPI")
+
+'Set the folder and items to watch:
+Set objInboxWatchFolder = objNS.GetDefaultFolder(olFolderInbox)
+Set objSentWatchFolder = objNS.GetDefaultFolder(olFolderSentMail)
+Set objInboxItem = objInboxWatchFolder.Items
+Set objSentItem = objSentWatchFolder.Items
+
+Set objInboxWatchFolder = Nothing
+Set objSentWatchFolder = Nothing
+End Sub
+
+Private Sub objInboxItem_ItemAdd(ByVal Item As Object)
+ MsgBox "objInboxItem_ItemAdd id running: "
+
+    'Dim m As MailItem
+    Dim inboxPath As String
+
+    inboxPath = "D:\outlook\outlook_inbox\"  '## Modify as needed
+    'm = Item
+    
+    inboxPath = inboxPath & Format(Now(), "yyyy-mm-dd hh_NN_ss") & " " & ReplaceIllegalCharacters(Item.Subject, "_ ")
+
+    inboxPath = inboxPath & ".mht"
+
+' Your code goes here
+MsgBox "Message subject: " & Item.Subject & vbCrLf & "Message sender: " & Item.SenderName & " (" & Item.SenderEmailAddress & ")"
+
+    Item.SaveAs inboxPath, olMHTML
+
+
+
+Set Item = Nothing
+End Sub
+
+Private Sub objSentItem_ItemAdd(ByVal Item As Object)
+ MsgBox "objSentItem_ItemAdd id running: "
+
+    'Dim m As MailItem
+    Dim sentPath As String
+
+    sentPath = "D:\outlook\outlook_sent\"  '## Modify as needed
+    'm = Item
+    
+    sentPath = sentPath & Format(Now(), "yyyy-mm-dd hh_NN_ss") & " " & ReplaceIllegalCharacters(Item.Subject, "_ ")
+
+    sentPath = sentPath & ".mht"
+
+' Your code goes here
+MsgBox "Message subject: " & Item.Subject & vbCrLf & "Message sender: " & Item.SenderName & " (" & Item.SenderEmailAddress & ")"
+
+    Item.SaveAs sentPath, olMHTML
+
+
+
+Set Item = Nothing
+End Sub
+
+Function ReplaceIllegalCharacters(strIn As String, strChar As String) As String
+    Dim strSpecialChars As String
+    Dim i As Long
+    strSpecialChars = "~""#%&*:<>?{|}/\[]" & Chr(10) & Chr(13)
+
+    For i = 1 To Len(strSpecialChars)
+        strIn = Replace(strIn, Mid$(strSpecialChars, i, 1), strChar)
+    Next
+
+    ReplaceIllegalCharacters = strIn
+End Function
+
+
+
+
+
+
+
+
