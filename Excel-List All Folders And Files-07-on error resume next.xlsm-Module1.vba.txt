@@ -1,7 +1,8 @@
 ' Lets try listing all files and folders of current folder. it run into and error if current folder is a driver. 
 ' All Folders And Files-07-on error resume next.xlsm
 ' please do not forget to enter this code into a file that is saved as ".xlsm" file.
-'
+' 
+' Module1:
 ' NOTE: You need to add Microsoft Scripting Runtime reference as below:
 ' tools menu/ references / Microsoft Scripting Runtime
 
